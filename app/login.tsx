@@ -12,13 +12,12 @@ import {
   LayoutAnimation,
   Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSignIn, useSignUp, useOAuth } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors } from '@/constants/theme';
 
@@ -144,16 +143,17 @@ export default function LoginScreen() {
 
   if (pendingVerification) {
     return (
-      <ThemedView style={styles.container}>
-        <KeyboardAvoidingView 
+      <SafeAreaView style={styles.container}>
+        <View style={styles.flex1}>
+          <KeyboardAvoidingView 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
           style={styles.keyboardView}
         >
           <View style={styles.header}>
-            <ThemedText type="title">Verify Email</ThemedText>
-            <ThemedText style={styles.subtitle}>
+            <Text >Verify Email</Text>
+            <Text style={styles.subtitle}>
               We sent a verification code to {email}
-            </ThemedText>
+            </Text>
           </View>
 
           <View style={styles.form}>
@@ -174,36 +174,38 @@ export default function LoginScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <ThemedText style={styles.buttonText}>Verify Email</ThemedText>
+                <Text style={styles.buttonText}>Verify Email</Text>
               )}
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-      </ThemedView>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <KeyboardAvoidingView 
+    <SafeAreaView style={styles.container}>
+      <View style={styles.flex1}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <KeyboardAvoidingView 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
           style={styles.keyboardView}
         >
           <View style={styles.header}>
-            <ThemedText type="title">
+            <Text >
               {isSignup ? 'Create Account' : 'Welcome Back'}
-            </ThemedText>
-            <ThemedText style={styles.subtitle}>
+            </Text>
+            <Text style={styles.subtitle}>
               {isSignup 
                 ? 'Sign up to get started' 
                 : 'Sign in to continue to your account'}
-            </ThemedText>
+            </Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Email</ThemedText>
+              <Text style={styles.label}>Email</Text>
               <TextInput
                 style={[styles.input, { color: textColor, borderColor: iconColor }]}
                 placeholder="hello@example.com"
@@ -216,7 +218,7 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Password</ThemedText>
+              <Text style={styles.label}>Password</Text>
               <TextInput
                 style={[styles.input, { color: textColor, borderColor: iconColor }]}
                 placeholder="••••••••"
@@ -235,15 +237,15 @@ export default function LoginScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <ThemedText style={styles.buttonText}>
+                <Text style={styles.buttonText}>
                   {isSignup ? 'Sign Up' : 'Sign In'}
-                </ThemedText>
+                </Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.divider}>
               <View style={[styles.line, { backgroundColor: iconColor }]} />
-              <ThemedText style={styles.orText}>or continue with</ThemedText>
+              <Text style={styles.orText}>or continue with</Text>
               <View style={[styles.line, { backgroundColor: iconColor }]} />
             </View>
 
@@ -253,7 +255,7 @@ export default function LoginScreen() {
                 onPress={() => onSelectOAuth('google')}
               >
                 <FontAwesome name="google" size={24} color={textColor} />
-                <ThemedText style={styles.socialButtonText}>Google</ThemedText>
+                <Text style={styles.socialButtonText}>Google</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
@@ -261,29 +263,33 @@ export default function LoginScreen() {
                 onPress={() => onSelectOAuth('apple')}
               >
                 <FontAwesome name="apple" size={24} color={textColor} />
-                <ThemedText style={styles.socialButtonText}>Apple</ThemedText>
+                <Text style={styles.socialButtonText}>Apple</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
-              <ThemedText style={styles.footerText}>
+              <Text style={styles.footerText}>
                 {isSignup ? 'Already have an account?' : "Don't have an account?"}
-              </ThemedText>
+              </Text>
               <TouchableOpacity onPress={toggleMode}>
-                <ThemedText style={[styles.linkText, { color: primaryColor }]}>
+                <Text style={[styles.linkText, { color: primaryColor }]}>
                   {isSignup ? 'Sign In' : 'Sign Up'}
-                </ThemedText>
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
-      </ScrollView>
-    </ThemedView>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex:1,
+  },
+  flex1: {
     flex: 1,
   },
   scrollContent: {
