@@ -58,7 +58,7 @@ export const DIMENSION_CONFIG: Record<Dimension, { name: string; color: string; 
     icon: 'group'
   },
   [DIMENSIONS.EGO]: {
-    name: 'Ego / Self-Kindness',
+    name: 'Ego / Self',
     color: '#30837D',
     description: 'Creating micro-moments of happiness through gratitude practices and activities that bring you joy.',
     icon: 'face'

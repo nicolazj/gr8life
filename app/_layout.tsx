@@ -4,8 +4,8 @@ import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { clerkTokenCache } from '@/lib/token-cache';
@@ -15,7 +15,7 @@ const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL || '', {
 });
 
 function ConvexClientWithAuth({ children }: { children: React.ReactNode }) {
-  const { isLoaded, getToken } = useAuth();
+  const { isLoaded, getToken, isSignedIn } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -40,9 +40,7 @@ function ConvexClientWithAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -64,7 +62,10 @@ export default function RootLayout() {
                 <Stack>
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                   <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+                  <Stack.Screen name="entry/[id]" options={{ presentation: 'modal', headerShown: false }} />
+                  <Stack.Screen name="personal-info" options={{ headerShown: false }} />
                   <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen name="setup" options={{ headerShown: false }} />
                 </Stack>
                 <StatusBar style="auto" />
               </ThemeProvider>

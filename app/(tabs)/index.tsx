@@ -1,7 +1,8 @@
+import { BalanceChartCard } from '@/components/BalanceChartCard';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { api } from '@/convex/_generated/api';
 import { DIMENSION_CONFIG, type Dimension } from '@/convex/schema';
-import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo';
+import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -10,14 +11,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useUser();
-  const weeklyCompletion = useQuery(api.entries.weeklyCompletion);
+  const getStartOfWeek = (now = new Date()) => {
+    const startOfWeek = new Date(now);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+    return startOfWeek.getTime();
+  };
+
+  const startOfWeekTimestamp = getStartOfWeek();
+  const weeklyCompletion = useQuery(api.entries.weeklyCompletion, { startTimestamp: startOfWeekTimestamp });
 
   const getWeekInfo = () => {
     const now = new Date();
     // Hardcoded to match image for consistency if desired, but dynamic is better
     // For now, let's keep it dynamic but format it like the image
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+    const startOfWeek = new Date(startOfWeekTimestamp);
+    // ... rest of logic relies on startOfWeek
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
@@ -34,17 +43,7 @@ export default function HomeScreen() {
     return `${startStr} - ${endStr} • Week ${weekNumber}`;
   };
 
-  const getCompletedCount = () => {
-    if (!weeklyCompletion) {
-      return 0;
-    }
-    const entries = Object.values(weeklyCompletion ?? {});
-    return entries.filter((v) => v).length;
-  };
 
-  const getBalanceScore = () => {
-    return Math.round((getCompletedCount() / 8) * 100);
-  };
 
   const getPillarStatus = (dimensionKey: Dimension, isCompleted: boolean) => {
     const dimension = DIMENSION_CONFIG[dimensionKey];
@@ -65,16 +64,16 @@ export default function HomeScreen() {
   const renderDimensionCard = (dimensionKey: Dimension, isCompleted: boolean) => {
     const { name, color, text, percentage } = getPillarStatus(dimensionKey, isCompleted);
 
-    // Mapping icons to match the image visually
+    // Mapping icons to matching SF Symbols
     const iconNames: Record<Dimension, string> = {
-      transact: 'attach-money', // specific icon
-      invest: 'trending-up',
-      assist: 'volunteer-activism',
-      learn: 'school', // book/learn
-      health: 'fitness-center', // dumbbell
-      family: 'family-restroom',
-      relationships: 'favorite', // heart
-      ego: 'self-improvement', // meditation/person
+      transact: 'dollarsign.circle.fill',
+      invest: 'chart.line.uptrend.xyaxis',
+      assist: 'hand.raised.fill',
+      learn: 'book.fill',
+      health: 'figure.run',
+      family: 'figure.2.and.child.holdinghands',
+      relationships: 'heart.fill',
+      ego: 'person.crop.circle',
     };
 
     return (
@@ -87,7 +86,6 @@ export default function HomeScreen() {
           <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
             <IconSymbol size={24} name={iconNames[dimensionKey]} color={color} />
           </View>
-
         </View>
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>{name}</Text>
@@ -99,93 +97,77 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <SignedOut>
-        <View style={styles.unauthContainer}>
-          <Text style={styles.unauthText}>Sign in to track your life dimensions</Text>
-          <TouchableOpacity
-            style={styles.signInButton}
-            onPress={() => router.push('/login')}
-          >
-            <Text style={styles.signInButtonText}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
-      </SignedOut>
-
-      <SignedIn>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.profileButton}>
-              {user?.imageUrl ? (
-                <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
-              ) : (
-                <View style={styles.avatarPlaceholder}>
-                  <IconSymbol name="person" size={20} color="#348578" />
-                </View>
-              )}
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>81-Framework</Text>
-            <TouchableOpacity style={styles.notificationButton}>
-              <IconSymbol size={24} name="notifications" color="#111827" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.titleSection}>
-            <Text style={styles.pageTitle}>Your Week at a Glance</Text>
-            <Text style={styles.dateSubtitle}>{getWeekInfo()}</Text>
-          </View>
-
-          {/* Action Button */}
-          <TouchableOpacity style={styles.ctaButton}>
-            <View style={styles.ctaContent}>
-              <View style={styles.ctaIconCircle}>
-                <IconSymbol size={16} name="check" color="#348578" />
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/setup')}>
+            {user?.imageUrl ? (
+              <Image source={{ uri: user.imageUrl }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <IconSymbol name="person" size={20} color="#348578" />
               </View>
-              <Text style={styles.ctaButtonText}>Complete Weekly Check-in</Text>
-            </View>
+            )}
           </TouchableOpacity>
+          {/* <Text style={styles.headerTitle}>Gr8life</Text> */}
+          {/* <TouchableOpacity style={styles.notificationButton}>
+            <IconSymbol size={24} name="notifications" color="#111827" />
+          </TouchableOpacity> */}
+        </View>
 
-          {/* Balance Chart Card */}
-          <View style={styles.balanceCard}>
-            <View style={styles.chartContainer}>
-              {/* Visual approximation of the radar chart */}
-              <View style={[styles.chartCircle, styles.chartCircle1]} />
-              <View style={[styles.chartCircle, styles.chartCircle2]} />
-              <View style={[styles.chartCircle, styles.chartCircle3]} />
-              <View style={styles.chartPolygon} />
+        <View style={styles.titleSection}>
+          <Text style={styles.pageTitle}>Your Week at a Glance</Text>
+          <Text style={styles.dateSubtitle}>{getWeekInfo()}</Text>
+        </View>
 
-              {/* Decorative graph line */}
-              <View style={styles.miniGraph} />
+        {/* Action Button */}
+        {/* <TouchableOpacity style={styles.ctaButton}>
+          <View style={styles.ctaContent}>
+            <View style={styles.ctaIconCircle}>
+              <IconSymbol size={16} name="check" color="#348578" />
             </View>
-            <Text style={styles.balanceLabel}>
-              HOLISTIC BALANCE: <Text style={styles.balanceValue}>{getBalanceScore()}%</Text>
+            <Text style={styles.ctaButtonText}>Complete Weekly Check-in</Text>
+          </View>
+        </TouchableOpacity> */}
+
+        {/* Balance Chart Card */}
+        {/* <View style={styles.balanceCard}>
+          <View style={styles.chartContainer}>
+            <View style={[styles.chartCircle, styles.chartCircle1]} />
+            <View style={[styles.chartCircle, styles.chartCircle2]} />
+            <View style={[styles.chartCircle, styles.chartCircle3]} />
+            <View style={styles.chartPolygon} />
+
+            <View style={styles.miniGraph} />
+          </View>
+          <Text style={styles.balanceLabel}>
+            HOLISTIC BALANCE: <Text style={styles.balanceValue}>{getBalanceScore()}%</Text>
+          </Text>
+        </View> */}
+        <BalanceChartCard />
+        {/* Pillars Grid */}
+        <View style={styles.pillarsSection}>
+          <Text style={styles.pillarsTitle}>Life Pillars Status</Text>
+          <View style={styles.dimensionsGrid}>
+            {Object.entries(DIMENSION_CONFIG).map(([key]) =>
+              renderDimensionCard(key as Dimension, (weeklyCompletion?.[key] ?? 0) > 0)
+            )}
+          </View>
+        </View>
+
+        {/* Tip Card */}
+        {/* <View style={styles.tipCard}>
+          <View style={styles.tipIconWrapper}>
+            <IconSymbol size={24} name="lightbulb" color="#92400E" />
+          </View>
+          <View style={styles.tipTextContainer}>
+            <Text style={styles.tipHeader}>Greatness Tip</Text>
+            <Text style={styles.tipText}>
+              You've prioritized Health and Learning this week. Consider a small "Family" connection today to maintain your holistic balance.
             </Text>
           </View>
-
-          {/* Pillars Grid */}
-          <View style={styles.pillarsSection}>
-            <Text style={styles.pillarsTitle}>Life Pillars Status</Text>
-            <View style={styles.dimensionsGrid}>
-              {Object.entries(DIMENSION_CONFIG).map(([key]) =>
-                renderDimensionCard(key as Dimension, weeklyCompletion?.[key] ?? false)
-              )}
-            </View>
-          </View>
-
-          {/* Tip Card */}
-          <View style={styles.tipCard}>
-            <View style={styles.tipIconWrapper}>
-              <IconSymbol size={24} name="lightbulb" color="#92400E" />
-            </View>
-            <View style={styles.tipTextContainer}>
-              <Text style={styles.tipHeader}>Greatness Tip</Text>
-              <Text style={styles.tipText}>
-                You've prioritized Health and Learning this week. Consider a small "Family" connection today to maintain your holistic balance.
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-      </SignedIn>
+        </View> */}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -198,17 +180,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-  },
-  unauthContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  unauthText: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
   },
   signInButton: {
     backgroundColor: '#30837D',

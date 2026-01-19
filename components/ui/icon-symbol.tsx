@@ -19,6 +19,17 @@ const MAPPING = {
   'gear': 'settings',
   'chevron.left': 'chevron-left',
   'chevron.right': 'chevron-right',
+  // Dimension Mappings
+  'dollarsign.circle.fill': 'attach-money',
+  'chart.line.uptrend.xyaxis': 'trending-up',
+  'hand.raised.fill': 'volunteer-activism',
+  'book.fill': 'school',
+  'figure.run': 'fitness-center',
+  'figure.2.and.child.holdinghands': 'family-restroom',
+  'heart.fill': 'favorite',
+  'person.crop.circle': 'self-improvement',
+  'xmark': 'close',
+  'text.quote': 'format-quote',
 } as const;
 
 export function IconSymbol({
