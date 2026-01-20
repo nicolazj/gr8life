@@ -4,7 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { DIMENSION_CONFIG, type Dimension } from '@/convex/schema';
 import { useQuery } from 'convex/react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,11 +41,7 @@ export default function DimensionDashboardScreen() {
 
     return (
         <>
-            <Stack.Screen
-                options={{
-                    headerShown: false, // Custom header for full control
-                }}
-            />
+
 
             <SafeAreaView style={styles.container} edges={['top']}>
                 {/* Custom Header */}

@@ -71,6 +71,8 @@ export default function RootLayout() {
                   <Stack.Screen name="notification-preferences" options={{ headerShown: false }} />
                   <Stack.Screen name="onboarding" options={{ headerShown: false }} />
                   <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="dimension/[dimension]/check-in" options={{ headerShown: false }} />
+                  <Stack.Screen name="dimension/[dimension]/index" options={{ headerShown: false }} />
                 </Stack>
                 <StatusBar style="auto" />
               </ThemeProvider>

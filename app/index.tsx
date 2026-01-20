@@ -15,10 +15,11 @@ export default function Bootstrap() {
 
         const hasNavigated = () => {
             // Hide splash screen once we know where we are going
+            SplashScreen.setOptions({ fade: true, duration: 500 });
             SplashScreen.hideAsync();
         };
 
-        if (!hasFinishedOnboarding) {
+        if (hasFinishedOnboarding) {
             router.replace('/onboarding');
             hasNavigated();
             return;

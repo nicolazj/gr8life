@@ -2,7 +2,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { api } from '@/convex/_generated/api';
 import { DIMENSION_CONFIG, type Dimension } from '@/convex/schema';
 import { useMutation } from 'convex/react';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,27 +36,16 @@ export default function DimensionDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Reflection",
-          headerShown: true,
-          headerShadowVisible: false,
-          headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: '600',
-            color: '#000',
-          },
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 8 }}>
-              <IconSymbol name="chevron.left" size={28} color="#000" />
-            </TouchableOpacity>
-          ),
-          headerBackVisible: false, // We use custom left button for exact control look
 
-        }}
-      />
 
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <IconSymbol name="chevron.left" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}></Text>
+          <View />
+        </View>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -136,6 +125,21 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  backButton: {
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+  },
   scrollContent: {
     padding: 24,
     paddingBottom: 100, // Space for footer
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
   heroSection: {
     alignItems: 'center',
     marginBottom: 40,
-    marginTop: 20,
+    marginTop: 0,
   },
   heroIconContainer: {
     width: 100,

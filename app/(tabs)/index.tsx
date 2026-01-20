@@ -84,7 +84,7 @@ export default function HomeScreen() {
       >
         <View style={styles.cardHeader}>
           <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
-            <IconSymbol size={24} name={iconNames[dimensionKey]} color={color} />
+            <IconSymbol size={24} name={DIMENSION_CONFIG[dimensionKey].icon} color={color} />
           </View>
         </View>
         <View style={styles.cardContent}>
