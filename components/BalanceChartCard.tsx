@@ -20,9 +20,6 @@ export function BalanceChartCard() {
     const weeklyCompletion = useQuery(api.entries.weeklyCompletion, { startTimestamp });
 
     // Extract counts from the data
-    const counts = Object.values(weeklyCompletion ?? {});
-    const n = 8; // Expecting 8 dimensions. Ideally get from config.
-    const values = counts.filter(v => typeof v === 'number') as number[];
     // Fill missing dimensions with 0 if necessary, though the API currently returns a map.
     // The current API (entries.ts) was updated to return a Record<string, number>.
     // Let's ensure we have 8 values.
@@ -38,23 +35,15 @@ export function BalanceChartCard() {
         dimensionValues.push(0);
     }
 
-    const sum = dimensionValues.reduce((a, b) => a + b, 0);
 
-    let score = 0;
-    if (sum > 0) {
-        // Calculate Coefficient of Variation (CV) = Standard Deviation / Mean
-        const mean = sum / n;
-        const variance = dimensionValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
-        const stdDev = Math.sqrt(variance);
-        const cv = stdDev / mean;
+    // New Scoring Logic: 1 point for each dimension > 0
+    let fillCount = 0;
+    dimensionValues.slice(0, 8).forEach(v => {
+        if (v > 0) fillCount++;
+    });
 
-        // Score = 100 / (1 + CV)
-        // If all values are equal, stdDev = 0, CV = 0, Score = 100.
-        // If variation is high, CV is high, Score decreases.
-        score = Math.round(100 / (1 + cv));
-    } else {
-        score = 0;
-    }
+    // Score is simply the count out of 8
+    const score = fillCount;
 
     // Animation values
     const pulse1 = useSharedValue(1);
@@ -79,7 +68,10 @@ export function BalanceChartCard() {
         );
     }, []);
 
-    const imbalance = (100 - score) / 100;
+    // Imbalance calculation:
+    // If score is 8, imbalance is 0 (concentric).
+    // If score is 0, imbalance is 1 (max displacement).
+    const imbalance = (8 - score) / 8;
 
     const style1 = useAnimatedStyle(() => ({
         transform: [
@@ -108,26 +100,11 @@ export function BalanceChartCard() {
                     <Animated.View style={[styles.circle, styles.circle2, style1]} />
                     {/* Inner Core */}
                     <View style={[styles.circle, styles.circle1]} />
-
-                    {/* Decorative Svg Line (Graph flourish) */}
-                    {/* <View style={styles.flourishContainer}>
-                        <Svg width="40" height="20" viewBox="0 0 40 20">
-                            <Path
-                                d="M0,20 L10,15 L20,18 L30,5 L40,10"
-                                fill="none"
-                                stroke="#30837D"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                            />
-                            <Circle cx="30" cy="5" r="2" fill="#30837D" />
-                            <Circle cx="40" cy="10" r="2" fill="#30837D" />
-                        </Svg>
-                    </View> */}
                 </View>
             </View>
 
             <View style={styles.statsContainer}>
-                <Text style={styles.label}>HOLISTIC BALANCE: <Text style={styles.value}>{score}%</Text></Text>
+                <Text style={styles.label}>HOLISTIC BALANCE: <Text style={styles.value}>{score}/8</Text></Text>
             </View>
         </View>
     );

@@ -64,7 +64,7 @@ export default function SetupScreen() {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={() => router.push('/notification-preferences')}>
             <View style={[styles.iconCircle, { backgroundColor: '#FFF3E0' }]}>
               <IconSymbol size={20} name="bell.fill" color="#F57C00" />
             </View>
@@ -135,7 +135,7 @@ export default function SetupScreen() {
 
         {/* Version Info */}
         <View style={styles.footer}>
-          <Text style={styles.versionText}>81-FRAMEWORK V1.2.4</Text>
+          <Text style={styles.versionText}>Gr8Life V1.2.4</Text>
           <Text style={styles.versionSubtext}>HOLISTIC OPTIMIZATION ENGINE</Text>
         </View>
 

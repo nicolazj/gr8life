@@ -1,4 +1,5 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { DIMENSION_INSPIRATIONS } from '@/constants/inspirations';
 import { api } from '@/convex/_generated/api';
 import { DIMENSION_CONFIG, type Dimension } from '@/convex/schema';
 import { useQuery } from 'convex/react';
@@ -139,16 +140,22 @@ export default function DimensionDashboardScreen() {
                     )}
 
                     {/* Health Integration Card */}
-                    <View style={styles.healthCard}>
-                        <View style={styles.healthIcon}>
-                            <IconSymbol name="bolt.fill" size={24} color="#F57C00" />
+                    {activeTab === 'ideas' && (
+                        <View style={styles.sectionContainer}>
+                            {DIMENSION_INSPIRATIONS[dimension || 'health'].map((inspiration, index) => (
+                                <View key={index} style={styles.inspirationCard}>
+                                    <View style={[styles.healthIcon, { backgroundColor: inspiration.color + '20' }]}>
+                                        <IconSymbol name={inspiration.icon} size={24} color={inspiration.color} />
+                                    </View>
+                                    <View style={styles.healthContent}>
+                                        <Text style={[styles.healthTitle, { color: '#000' }]}>{inspiration.title}</Text>
+                                        <Text style={[styles.healthDesc, { color: '#6B7280' }]}>{inspiration.description}</Text>
+                                    </View>
+                                    <IconSymbol name="arrow.right" size={20} color={inspiration.color} />
+                                </View>
+                            ))}
                         </View>
-                        <View style={styles.healthContent}>
-                            <Text style={styles.healthTitle}>Health Integration</Text>
-                            <Text style={styles.healthDesc}>Combine walking date with daily step goal.</Text>
-                        </View>
-                        <IconSymbol name="arrow.right" size={20} color="#F57C00" />
-                    </View>
+                    )}
 
                 </ScrollView>
             </SafeAreaView>
@@ -353,6 +360,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.03,
+        shadowRadius: 6,
+        elevation: 2,
+    },
+    inspirationCard: {
+        backgroundColor: '#fff',
+        padding: 20, // Kept padding 20 from healthCard, or could be 16 like interactionCard. Let's stick to 16 to match? But healthCard text might need space. healthCard had 20. let's use 20.
+        borderRadius: 24, // healthCard was 24, interactionCard 20. Let's keep 24 as it was.
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.03,

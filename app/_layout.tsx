@@ -1,14 +1,17 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { ConvexProvider, ConvexReactClient } from 'convex/react';
-import { Stack } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { clerkTokenCache } from '@/lib/token-cache';
+// import as from '@react-native-async-storage/async-storage';
+// as.clear();
+
+SplashScreen.preventAutoHideAsync();
 
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL || '', {
   unsavedChangesWarning: false,
@@ -43,7 +46,6 @@ function ConvexClientWithAuth({ children }: { children: React.ReactNode }) {
 
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
@@ -58,7 +60,7 @@ export default function RootLayout() {
         <ClerkLoaded>
           <ConvexClientWithAuth>
             <ConvexProvider client={convex}>
-              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <ThemeProvider value={DefaultTheme}>
                 <Stack>
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                   <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
@@ -66,6 +68,9 @@ export default function RootLayout() {
                   <Stack.Screen name="personal-info" options={{ headerShown: false }} />
                   <Stack.Screen name="login" options={{ headerShown: false }} />
                   <Stack.Screen name="setup" options={{ headerShown: false }} />
+                  <Stack.Screen name="notification-preferences" options={{ headerShown: false }} />
+                  <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
                 </Stack>
                 <StatusBar style="auto" />
               </ThemeProvider>
