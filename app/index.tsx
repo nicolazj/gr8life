@@ -8,10 +8,10 @@ import { View } from 'react-native';
 export default function Bootstrap() {
     const { isLoaded, isSignedIn } = useAuth();
     const router = useRouter();
-    const { hasFinishedOnboarding } = useAppStore();
+    const { hasFinishedOnboarding, hasHydrated } = useAppStore();
 
     useEffect(() => {
-        if (!isLoaded) return;
+        if (!isLoaded || !hasHydrated) return;
 
         const hasNavigated = () => {
             // Hide splash screen once we know where we are going
@@ -32,7 +32,7 @@ export default function Bootstrap() {
             router.replace('/login');
             hasNavigated();
         }
-    }, [isLoaded, isSignedIn, hasFinishedOnboarding]);
+    }, [isLoaded, isSignedIn, hasFinishedOnboarding, hasHydrated]);
 
     return <View />;
 }
