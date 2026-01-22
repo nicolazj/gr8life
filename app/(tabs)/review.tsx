@@ -7,7 +7,7 @@ export default function ReviewScreen() {
     <SafeAreaView style={styles.container}>
       <ComingSoon
         title="Coming Soon"
-        description="We are working hard to bring this feature to Gr8Life. Stay tuned for updates as we continue to evolve our tools for holistic self-improvement."
+        description="We are working hard to bring this feature to gr8Life. Stay tuned for updates as we continue to evolve our tools for holistic self-improvement."
       />
     </SafeAreaView>
   );

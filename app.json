@@ -1,27 +1,25 @@
 {
   "expo": {
     "name": "gr8life",
-    "slug": "gr8life",
+    "slug": "gr8",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/adaptive-icon.png",
     "scheme": "gr8life",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shenma.gr8life"
+      "bundleIdentifier": "com.nicolazj.gr8life",
+      "appleTeamId": "2AWM9UNUMK",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.shenma.gr8life"
+      "package": "com.nicolazj.gr8life"
     },
     "web": {
       "output": "static",
@@ -35,7 +33,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "##CFE7E5"
         }
       ],
       "@react-native-community/datetimepicker"
@@ -43,6 +41,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5696a0be-3a39-4edd-b42d-d1b57489e924"
+      }
     }
   }
 }

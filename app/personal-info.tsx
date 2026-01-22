@@ -153,7 +153,7 @@ export default function PersonalInfoScreen() {
                     </TouchableOpacity>
 
                     <View style={styles.footer}>
-                        <Text style={styles.footerText}>Gr8Life</Text>
+                        <Text style={styles.footerText}>gr8Life</Text>
                         <Text style={styles.footerSubtext}>IDENTITY CONFIGURATION</Text>
                     </View>
 

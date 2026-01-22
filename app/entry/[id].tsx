@@ -76,7 +76,7 @@ export default function EntryDetailScreen() {
                         <IconSymbol name="chart.bar.fill" size={20} color="#fff" />
                     </View>
                     <View style={styles.progressContent}>
-                        <Text style={styles.progressTitle}>GR8LIFE PROGRESS</Text>
+                        <Text style={styles.progressTitle}>gr8Life PROGRESS</Text>
                         <Text style={styles.progressSubtitle}>Contributes +1 to {entry.dimension} consistency.</Text>
                     </View>
                 </View>

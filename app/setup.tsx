@@ -18,7 +18,7 @@ export default function SetupScreen() {
           <IconSymbol size={24} name="chevron.left" color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
-        <TouchableOpacity>
+        <TouchableOpacity style={{ opacity: 0 }}>
           <IconSymbol size={24} name="ellipsis" color="#000" />
         </TouchableOpacity>
       </View>
@@ -135,7 +135,7 @@ export default function SetupScreen() {
 
         {/* Version Info */}
         <View style={styles.footer}>
-          <Text style={styles.versionText}>Gr8Life V1.2.4</Text>
+          <Text style={styles.versionText}>gr8Life</Text>
           <Text style={styles.versionSubtext}>HOLISTIC OPTIMIZATION ENGINE</Text>
         </View>
 

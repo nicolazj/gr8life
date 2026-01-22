@@ -61,7 +61,6 @@ export default function DimensionDetailScreen() {
               />
             </View>
             <Text style={styles.heroTitle}>{config.name}</Text>
-            <Text style={styles.heroSubtitle}>{config.description}</Text>
           </View>
 
           {/* Reflection Section */}
@@ -105,7 +104,7 @@ export default function DimensionDetailScreen() {
             ) : (
               <>
                 <View style={styles.checkIconWrapper}>
-                  <IconSymbol name="check" size={18} color={ACTION_COLOR} />
+                  <IconSymbol name="checkmark" size={18} color={ACTION_COLOR} />
                 </View>
                 <Text style={styles.submitButtonText}>Complete Check-in</Text>
               </>

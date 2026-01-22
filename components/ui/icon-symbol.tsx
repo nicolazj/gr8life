@@ -30,6 +30,8 @@ const MAPPING = {
   'person.crop.circle': 'self-improvement',
   'xmark': 'close',
   'text.quote': 'format-quote',
+  'checkmark': 'check',
+  'arrow.right': 'arrow-forward',
 } as const;
 
 export function IconSymbol({

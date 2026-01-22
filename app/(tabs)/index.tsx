@@ -109,7 +109,7 @@ export default function HomeScreen() {
               </View>
             )}
           </TouchableOpacity>
-          {/* <Text style={styles.headerTitle}>Gr8life</Text> */}
+          {/* <Text style={styles.headerTitle}>gr8Life</Text> */}
           {/* <TouchableOpacity style={styles.notificationButton}>
             <IconSymbol size={24} name="notifications" color="#111827" />
           </TouchableOpacity> */}

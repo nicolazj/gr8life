@@ -19,7 +19,7 @@ export default function Bootstrap() {
             SplashScreen.hideAsync();
         };
 
-        if (hasFinishedOnboarding) {
+        if (!hasFinishedOnboarding) {
             router.replace('/onboarding');
             hasNavigated();
             return;

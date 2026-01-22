@@ -3,27 +3,30 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface NotificationState {
-    remindersEnabled: boolean;
-    frequency: 'Daily' | 'Weekly';
-    reminderTime: string; // ISO string to be safe with AsyncStorage
-    reminderDay: number; // 0 = Sunday, 1 = Monday, etc.
-    toggleReminders: (value: boolean) => void;
-    setFrequency: (frequency: 'Daily' | 'Weekly') => void;
+    reminderTime: string; // ISO string
+    reminderDays: number[]; // 0 = Sunday, 1 = Monday, etc.
     setReminderTime: (time: string) => void;
-    setReminderDay: (day: number) => void;
+    toggleReminderDay: (day: number) => void;
+    setReminderDays: (days: number[]) => void;
 }
 
 export const useNotificationStore = create<NotificationState>()(
     persist(
         (set) => ({
-            remindersEnabled: true,
-            frequency: 'Daily',
-            reminderTime: new Date().toISOString(),
-            reminderDay: new Date().getDay(), // Default to today
-            toggleReminders: (value) => set({ remindersEnabled: value }),
-            setFrequency: (frequency) => set({ frequency }),
+            reminderTime: (() => {
+                const d = new Date();
+                d.setHours(20, 0, 0, 0);
+                return d.toISOString();
+            })(),
+            reminderDays: [0], // Default to Sunday
             setReminderTime: (time) => set({ reminderTime: time }),
-            setReminderDay: (day) => set({ reminderDay: day }),
+            toggleReminderDay: (day) => set((state) => {
+                const days = state.reminderDays.includes(day)
+                    ? state.reminderDays.filter((d) => d !== day)
+                    : [...state.reminderDays, day];
+                return { reminderDays: days.sort((a, b) => a - b) };
+            }),
+            setReminderDays: (days) => set({ reminderDays: days }),
         }),
         {
             name: 'notification-storage',

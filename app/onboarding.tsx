@@ -1,6 +1,8 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { DIMENSION_CONFIG } from '@/convex/schema';
 import { useAppStore } from '@/store/appStore';
+import { useNotificationStore } from '@/store/notificationStore';
+import { scheduleReminder } from '@/utils/notifications';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
@@ -113,7 +115,13 @@ export default function OnboardingScreen() {
         }
     };
 
-    const completeOnboarding = () => {
+    const completeOnboarding = async () => {
+        const { reminderTime, reminderDays } = useNotificationStore.getState();
+        try {
+            await scheduleReminder(new Date(reminderTime), reminderDays);
+        } catch (e) {
+            console.error('Failed to schedule initial reminder:', e);
+        }
         setHasFinishedOnboarding(true);
         router.replace('/');
     };
@@ -166,7 +174,7 @@ export default function OnboardingScreen() {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Gr8Life</Text>
+                <Text style={styles.headerTitle}>gr8Life</Text>
                 <TouchableOpacity onPress={completeOnboarding}>
                     <Text style={styles.skipText}>Skip</Text>
                 </TouchableOpacity>

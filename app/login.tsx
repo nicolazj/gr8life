@@ -1,3 +1,4 @@
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useOAuth, useSignIn, useSignUp } from '@clerk/clerk-expo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -159,9 +160,9 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View></View>
+        <View ></View>
         <Text style={styles.headerTitle}>SIGN IN</Text>
-        <View style={{ width: 24 }} />
+        <View />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -177,7 +178,7 @@ export default function LoginScreen() {
 
           <View style={styles.textContainer}>
             <Text style={styles.title}>
-              Welcome to Gr8Life
+              Welcome to gr8Life
             </Text>
             <Text style={styles.subtitle}>
               {step === 'code'
@@ -212,6 +213,7 @@ export default function LoginScreen() {
                   ) : (
                     <View style={styles.buttonContent}>
                       <Text style={styles.buttonText}>Continue</Text>
+                      <IconSymbol name="arrow.right" size={20} color="white" />
                     </View>
                   )}
                 </TouchableOpacity>

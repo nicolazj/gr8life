@@ -7,7 +7,7 @@ export async function requestNotificationPermissions() {
     await notifee.requestPermission();
 }
 
-export async function scheduleReminder(time: Date, frequency: 'Daily' | 'Weekly', dayOfWeek?: number) {
+export async function scheduleReminder(time: Date, days: number[]) {
     // 1. Request permissions (if not already granted)
     await requestNotificationPermissions();
 
@@ -16,18 +16,24 @@ export async function scheduleReminder(time: Date, frequency: 'Daily' | 'Weekly'
         id: CHANNEL_ID,
         name: 'Check-in Reminders',
         importance: AndroidImportance.HIGH,
-        sound: 'default', // Using default sound for now, customization can be added later
+        sound: 'default',
     });
 
-    // 3. Calculate trigger time
-    // Ensure the time is in the future. If the time has passed for today, schedule for tomorrow (Daily) or next week (Weekly).
-    let triggerDate = new Date(Date.now());
-    triggerDate.setHours(time.getHours());
-    triggerDate.setMinutes(time.getMinutes());
-    triggerDate.setSeconds(0);
-    triggerDate.setMilliseconds(0);
+    // Cancel any existing reminders first to avoid duplicates/stale schedules
+    await cancelReminders();
 
-    if (frequency === 'Weekly' && dayOfWeek !== undefined) {
+    if (days.length === 0) {
+        return;
+    }
+
+    // 3. Schedule a notification for each selected day
+    for (const dayOfWeek of days) {
+        let triggerDate = new Date(Date.now());
+        triggerDate.setHours(time.getHours());
+        triggerDate.setMinutes(time.getMinutes());
+        triggerDate.setSeconds(0);
+        triggerDate.setMilliseconds(0);
+
         const currentDay = triggerDate.getDay();
         const difference = dayOfWeek - currentDay;
         let daysToAdd = difference;
@@ -41,56 +47,43 @@ export async function scheduleReminder(time: Date, frequency: 'Daily' | 'Weekly'
             }
         }
 
-        // Special case: if difference > 0, we just add difference.
-        // But we need to make sure we don't schedule in the past if it's "today" earlier.
-        // The logic above handles Today (diff=0).
-        // For future days (diff > 0), simple add works.
-        // For past days (diff < 0), add 7 + diff works (e.g. Today Mon(1), Target Sun(0). Diff -1. Add 6. Mon+6=Sun).
-
         triggerDate.setDate(triggerDate.getDate() + daysToAdd);
 
-    } else {
-        // Daily, or Weekly without day specified (shouldn't happen with UI enforcement)
-        if (triggerDate.getTime() <= Date.now()) {
-            if (frequency === 'Daily') {
-                triggerDate.setDate(triggerDate.getDate() + 1);
-            } else {
-                // Fallback for weekly if no day set, just next week
-                triggerDate.setDate(triggerDate.getDate() + 7);
-            }
-        }
-    }
+        const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: triggerDate.getTime(),
+            repeatFrequency: RepeatFrequency.WEEKLY,
+        };
 
-    // 4. Create the trigger
-    const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: triggerDate.getTime(),
-        repeatFrequency: frequency === 'Daily' ? RepeatFrequency.DAILY : RepeatFrequency.WEEKLY,
-    };
+        // Unique ID for each day: daily-check-in-0, daily-check-in-1, etc.
+        const notificationId = `${REMINDER_NOTIFICATION_ID}-${dayOfWeek}`;
 
-    // 5. Create/Update the trigger notification
-    await notifee.createTriggerNotification(
-        {
-            id: REMINDER_NOTIFICATION_ID,
-            title: 'Time to check in!',
-            body: 'Take a moment to reflect on your 8 pillars of life.',
-            android: {
-                channelId: CHANNEL_ID,
-                pressAction: {
-                    id: 'default',
+        await notifee.createTriggerNotification(
+            {
+                id: notificationId,
+                title: 'Time to check in!',
+                body: 'Take a moment to reflect on your 8 pillars of life.',
+                android: {
+                    channelId: CHANNEL_ID,
+                    pressAction: {
+                        id: 'default',
+                    },
                 },
+                ios: {
+                    sound: 'default',
+                }
             },
-            ios: {
-                sound: 'default',
-            }
-        },
-        trigger,
-    );
+            trigger,
+        );
 
-    console.log(`Notification scheduled for ${triggerDate.toISOString()} repeating ${frequency}`);
+        console.log(`Notification scheduled for ${triggerDate.toISOString()} (Day ${dayOfWeek})`);
+    }
 }
 
 export async function cancelReminders() {
+    // Cancel the single ID (legacy) and all possible day IDs
     await notifee.cancelNotification(REMINDER_NOTIFICATION_ID);
-    console.log('Notification cancelled');
+    const dayIds = [0, 1, 2, 3, 4, 5, 6].map(d => `${REMINDER_NOTIFICATION_ID}-${d}`);
+    await Promise.all(dayIds.map(id => notifee.cancelNotification(id)));
+    console.log('Notifications cancelled');
 }

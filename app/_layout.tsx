@@ -8,8 +8,6 @@ import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { clerkTokenCache } from '@/lib/token-cache';
-// import as from '@react-native-async-storage/async-storage';
-// as.clear();
 
 SplashScreen.preventAutoHideAsync();
 

@@ -9,10 +9,9 @@ import {
     Platform,
     ScrollView,
     StyleSheet,
-    Switch,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -21,14 +20,10 @@ export default function NotificationPreferencesScreen() {
 
     // Store
     const {
-        remindersEnabled,
-        frequency,
         reminderTime,
-        reminderDay,
-        toggleReminders,
-        setFrequency,
+        reminderDays,
         setReminderTime,
-        setReminderDay,
+        toggleReminderDay,
     } = useNotificationStore();
 
     const [showTimePicker, setShowTimePicker] = useState(false);
@@ -55,10 +50,10 @@ export default function NotificationPreferencesScreen() {
 
     const handleSave = async () => {
         try {
-            if (remindersEnabled) {
-                // Determine the reminder date object
+            // Logic: if any day is selected, schedule reminders. If empty, cancel.
+            if (reminderDays.length > 0) {
                 const timeToSchedule = new Date(reminderTime);
-                await scheduleReminder(timeToSchedule, frequency, reminderDay);
+                await scheduleReminder(timeToSchedule, reminderDays);
             } else {
                 await cancelReminders();
             }
@@ -84,76 +79,38 @@ export default function NotificationPreferencesScreen() {
 
             <ScrollView contentContainerStyle={styles.content}>
 
-                {/* Framework Reminders */}
-                <Text style={styles.sectionTitle}>FRAMEWORK REMINDERS</Text>
-                <View style={styles.card}>
-                    <View style={styles.row}>
-                        <View style={styles.textContainer}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#E0F2F1' }]}>
-                                <IconSymbol name="bell.fill" size={24} color={primaryColor} />
-                            </View>
-                            <View style={styles.textContent}>
-                                <Text style={styles.itemTitle}>Enable Reminders</Text>
-                                <Text style={styles.itemSubtitle}>Daily check-in alerts</Text>
-                            </View>
-                        </View>
-                        <Switch
-                            value={remindersEnabled}
-                            onValueChange={toggleReminders}
-                            trackColor={{ false: '#E5E7EB', true: '#34D399' }} // Light gray / Green
-                            thumbColor={'#FEFEFE'}
-                            ios_backgroundColor="#E5E7EB"
-                        />
-                    </View>
-                </View>
-
-                {/* Schedule Configuration */}
                 <Text style={styles.sectionTitle}>SCHEDULE CONFIGURATION</Text>
                 <View style={styles.card}>
-                    <View style={styles.frequencyContainer}>
-                        <Text style={styles.frequencyLabel}>Check-in Frequency</Text>
-                        <View style={styles.segmentControl}>
-                            <TouchableOpacity
-                                style={[styles.segment, frequency === 'Daily' && styles.segmentActive]}
-                                onPress={() => setFrequency('Daily')}
-                            >
-                                <Text style={[styles.segmentText, frequency === 'Daily' && styles.segmentTextActive]}>Daily</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.segment, frequency === 'Weekly' && styles.segmentActive]}
-                                onPress={() => setFrequency('Weekly')}
-                            >
-                                <Text style={[styles.segmentText, frequency === 'Weekly' && styles.segmentTextActive]}>Weekly</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <Text style={styles.cardDescription}>
+                        Select the days you want to receive check-in reminders.
+                        Reminders are automatically enabled when at least one day is selected.
+                    </Text>
 
-                    {frequency === 'Weekly' && (
-                        <>
-                            <Text style={styles.daySelectorLabel}>Select Day</Text>
-                            <View style={styles.daySelector}>
-                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-                                    <TouchableOpacity
-                                        key={index}
+                    <Text style={styles.daySelectorLabel}>Select Days</Text>
+                    <View style={styles.daySelector}>
+                        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => {
+                            const isSelected = reminderDays.includes(index);
+                            return (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={[
+                                        styles.dayBubble,
+                                        isSelected && styles.dayBubbleActive,
+                                    ]}
+                                    onPress={() => toggleReminderDay(index)}
+                                >
+                                    <Text
                                         style={[
-                                            styles.dayBubble,
-                                            reminderDay === index && styles.dayBubbleActive,
+                                            styles.dayText,
+                                            isSelected && styles.dayTextActive,
                                         ]}
-                                        onPress={() => setReminderDay(index)}
                                     >
-                                        <Text
-                                            style={[
-                                                styles.dayText,
-                                                reminderDay === index && styles.dayTextActive,
-                                            ]}
-                                        >
-                                            {day}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        </>
-                    )}
+                                        {day}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
 
                     <View style={styles.divider} />
 
@@ -170,6 +127,7 @@ export default function NotificationPreferencesScreen() {
                             <RNDateTimePicker
                                 value={reminderDateObj}
                                 mode="time"
+                                minuteInterval={15}
                                 display="compact"
                                 onChange={onTimeChange}
                                 themeVariant="light"
@@ -191,7 +149,6 @@ export default function NotificationPreferencesScreen() {
                     </View>
                 </View>
 
-
                 {/* Footer */}
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -199,8 +156,6 @@ export default function NotificationPreferencesScreen() {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
-
-
         </SafeAreaView>
     );
 }
@@ -279,45 +234,11 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#9CA3AF',
     },
-    frequencyContainer: {
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    frequencyLabel: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#111827',
-        marginBottom: 12,
-    },
-    segmentControl: {
-        flexDirection: 'row',
-        backgroundColor: '#F3F4F6',
-        borderRadius: 12,
-        padding: 4,
-        width: '100%',
-    },
-    segment: {
-        flex: 1,
-        paddingVertical: 8,
-        alignItems: 'center',
-        borderRadius: 8,
-    },
-    segmentActive: {
-        backgroundColor: '#FFF',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
-    },
-    segmentText: {
+    cardDescription: {
         fontSize: 14,
         color: '#6B7280',
-        fontWeight: '500',
-    },
-    segmentTextActive: {
-        color: '#000',
-        fontWeight: '600',
+        marginBottom: 16,
+        lineHeight: 20,
     },
     divider: {
         height: 1,
@@ -329,20 +250,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         color: '#111827',
-        marginLeft: 16,
-        marginTop: 16,
-        marginBottom: 8,
+        marginLeft: 0,
+        marginBottom: 12,
     },
     daySelector: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingHorizontal: 16,
-        paddingBottom: 16,
+        justifyContent: 'space-between',
+        paddingBottom: 8,
     },
     dayBubble: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#F3F4F6',
         justifyContent: 'center',
         alignItems: 'center',
@@ -390,19 +309,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
-    rowRight: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    valueText: {
-        fontSize: 14,
-        color: '#9CA3AF',
-        paddingRight: 4
-    },
     footer: {
-
-        backgroundColor: '#FAF9F6',
+        marginTop: 24,
         paddingBottom: Platform.OS === 'ios' ? 0 : 20,
     },
     saveButton: {
