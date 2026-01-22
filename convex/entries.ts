@@ -106,7 +106,7 @@ export const weeklyCompletion = query({
 
     for (const entry of entries) {
       if (counts[entry.dimension] !== undefined) {
-        counts[entry.dimension] = 1;
+        counts[entry.dimension]++;
       }
     }
 

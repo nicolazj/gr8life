@@ -1,35 +1,30 @@
-import { Tabs } from 'expo-router';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Icon, Label, NativeTabs, VectorIcon } from 'expo-router/unstable-native-tabs';
 import React from 'react';
+import { Platform } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 
 export default function TabLayout() {
-
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
+    <NativeTabs
+      tintColor={Colors.tint}
+    >
+      <NativeTabs.Trigger name="index">
+        <Label>Home</Label>
+        {Platform.select({
+          ios: <Icon sf="house.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="home" />} />,
+        })}
+      </NativeTabs.Trigger>
 
-      <Tabs.Screen
-        name="review"
-        options={{
-          title: 'Review',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
-        }}
-      />
-
-    </Tabs>
+      <NativeTabs.Trigger name="review">
+        <Label>Review</Label>
+        {Platform.select({
+          ios: <Icon sf="chart.bar.fill" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="bar-chart" />} />,
+        })}
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
