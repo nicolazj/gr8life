@@ -66,7 +66,7 @@ export const entriesByDimension = query({
   },
 });
 
-export const weeklyCompletion = query({
+export const entryCompletion = query({
   args: {
     startTimestamp: v.number(),
   },

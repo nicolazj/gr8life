@@ -55,7 +55,7 @@ export default function DimensionDetailScreen() {
           <View style={styles.heroSection}>
             <View style={[styles.heroIconContainer, { backgroundColor: `${config.color}15` }]}>
               <IconSymbol
-                size={48}
+                size={32}
                 name={config.icon}
                 color={config.color}
               />
@@ -145,22 +145,22 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 24,
     marginTop: 0,
   },
   heroIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 30, // Squircle-ish
+    width: 64,
+    height: 64,
+    borderRadius: 24, // Squircle-ish
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '800', // Extra bold
     color: '#111827',
-    marginBottom: 8,
+    marginBottom: 4,
     letterSpacing: -0.5,
   },
   heroSubtitle: {

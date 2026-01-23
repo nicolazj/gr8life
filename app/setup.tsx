@@ -1,7 +1,7 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SetupScreen() {
@@ -45,10 +45,7 @@ export default function SetupScreen() {
           </View> */}
         </View>
 
-        {/* Account Architecture Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>ACCOUNT ARCHITECTURE</Text>
-        </View>
+
 
         <View style={styles.card}>
           <TouchableOpacity style={styles.row} onPress={() => router.push('/personal-info')}>
@@ -136,7 +133,10 @@ export default function SetupScreen() {
         {/* Version Info */}
         <View style={styles.footer}>
           <Text style={styles.versionText}>gr8Life</Text>
-          <Text style={styles.versionSubtext}>HOLISTIC OPTIMIZATION ENGINE</Text>
+          {/* <Text style={styles.versionSubtext}>HOLISTIC OPTIMIZATION ENGINE</Text> */}
+          <TouchableOpacity onPress={() => Linking.openURL('https://hellohenrik.com/81-framework')}>
+            <Text style={styles.versionSubtext}>Inspired by https://hellohenrik.com/81-framework</Text>
+          </TouchableOpacity>
         </View>
 
       </ScrollView>

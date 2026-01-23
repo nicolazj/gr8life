@@ -1,5 +1,4 @@
-import { api } from '@/convex/_generated/api';
-import { useQuery } from 'convex/react';
+// import { useQuery } from 'convex/react';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -11,13 +10,12 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 
-export function BalanceChartCard() {
+export function BalanceChartCard({ weeklyCompletion }: { weeklyCompletion: Record<string, number> | undefined }) {
     const startOfWeek = new Date();
     startOfWeek.setHours(0, 0, 0, 0);
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Monday
-    const startTimestamp = startOfWeek.getTime();
-
-    const weeklyCompletion = useQuery(api.entries.weeklyCompletion, { startTimestamp });
+    //    const startTimestamp = startOfWeek.getTime();
+    //    const weeklyCompletion = useQuery(api.entries.entryCompletion, { startTimestamp });
 
     // Extract counts from the data
     // Fill missing dimensions with 0 if necessary, though the API currently returns a map.
@@ -104,7 +102,8 @@ export function BalanceChartCard() {
             </View>
 
             <View style={styles.statsContainer}>
-                <Text style={styles.label}>HOLISTIC BALANCE: <Text style={styles.value}>{score}/8</Text></Text>
+                <Text style={styles.label}>WEEKLY BALANCE: <Text style={styles.value}>{score}/8</Text></Text>
+                <Text style={styles.subLabel}>Check in to align the circles</Text>
             </View>
         </View>
     );
@@ -183,5 +182,11 @@ const styles = StyleSheet.create({
     value: {
         color: '#30837D', // Primary Color
         fontWeight: '800',
+    },
+    subLabel: {
+        marginTop: 8,
+        fontSize: 12,
+        color: '#8CA3A1',
+        fontWeight: '500',
     },
 });

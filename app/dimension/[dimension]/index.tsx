@@ -1,5 +1,5 @@
+import { InspirationList } from '@/components/InspirationList';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { DIMENSION_INSPIRATIONS } from '@/constants/inspirations';
 import { api } from '@/convex/_generated/api';
 import { DIMENSION_CONFIG, type Dimension } from '@/convex/schema';
 import { useQuery } from 'convex/react';
@@ -50,7 +50,7 @@ export default function DimensionDashboardScreen() {
                         <IconSymbol name="chevron.left" size={24} color="#000" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>{config.name}</Text>
-                    <TouchableOpacity onPress={() => { }}>
+                    <TouchableOpacity onPress={() => { }} style={{ opacity: 0 }}>
                         <IconSymbol name="ellipsis" size={24} color="#000" />
                     </TouchableOpacity>
                 </View>
@@ -136,21 +136,9 @@ export default function DimensionDashboardScreen() {
                     )}
 
                     {/* Health Integration Card */}
+                    {/* Health Integration Card */}
                     {activeTab === 'ideas' && (
-                        <View style={styles.sectionContainer}>
-                            {DIMENSION_INSPIRATIONS[dimension || 'health'].map((inspiration, index) => (
-                                <View key={index} style={styles.inspirationCard}>
-                                    <View style={[styles.healthIcon, { backgroundColor: inspiration.color + '20' }]}>
-                                        <IconSymbol name={inspiration.icon} size={24} color={inspiration.color} />
-                                    </View>
-                                    <View style={styles.healthContent}>
-                                        <Text style={[styles.healthTitle, { color: '#000' }]}>{inspiration.title}</Text>
-                                        <Text style={[styles.healthDesc, { color: '#6B7280' }]}>{inspiration.description}</Text>
-                                    </View>
-                                    <IconSymbol name="arrow.right" size={20} color={inspiration.color} />
-                                </View>
-                            ))}
-                        </View>
+                        <InspirationList dimension={dimension || 'health'} color={config.color} />
                     )}
 
                 </ScrollView>
@@ -411,36 +399,5 @@ const styles = StyleSheet.create({
     emptyText: {
         color: '#9CA3AF',
         fontSize: 14,
-    },
-    healthCard: {
-        marginHorizontal: 20,
-        backgroundColor: '#FFF8E1',
-        padding: 20,
-        borderRadius: 24,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    healthIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#FFE0B2',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 16,
-    },
-    healthContent: {
-        flex: 1,
-    },
-    healthTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#E65100', // Deep orange
-        marginBottom: 2,
-    },
-    healthDesc: {
-        fontSize: 13,
-        color: '#E65100',
-        opacity: 0.7,
     },
 });

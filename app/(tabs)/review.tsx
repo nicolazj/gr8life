@@ -1,13 +1,16 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { api } from '@/convex/_generated/api';
-import { DIMENSION_CONFIG, Dimension } from '@/convex/schema';
+import { DIMENSION_CONFIG } from '@/convex/schema';
 import { useUser } from '@clerk/clerk-expo';
+
 import { useQuery } from 'convex/react';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ReviewScreen() {
+  const router = useRouter();
   const { user } = useUser();
   const date = new Date();
   const dateString = date.toLocaleDateString('en-US', {
@@ -16,48 +19,19 @@ export default function ReviewScreen() {
     day: 'numeric',
   });
 
-  const startOfWeek = new Date();
-  startOfWeek.setHours(0, 0, 0, 0);
-  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1); // Monday
-  const startTimestamp = startOfWeek.getTime();
+  const allCompletion = useQuery(api.entries.entryCompletion, { startTimestamp: 0 });
 
-  const weeklyCompletion = useQuery(api.entries.weeklyCompletion, { startTimestamp });
+  const sortedDimensions = React.useMemo(() => {
+    if (!allCompletion) return [];
 
-  // Calculate score: 1 point for each dimension > 0
-  let score = 0;
-  let maxDimension: Dimension | null = null;
-  let maxCount = 0;
-
-  if (weeklyCompletion) {
-    const dimensionValues: number[] = [];
-    Object.entries(weeklyCompletion).forEach(([key, value]) => {
-      if (typeof value === 'number') {
-        dimensionValues.push(value);
-        if (value > maxCount) {
-          maxCount = value;
-          maxDimension = key as Dimension;
-        }
-      }
-    });
-    // Count dimensions with at least one entry
-    score = dimensionValues.filter(v => v > 0).length;
-  }
-  // Cap score at 8 just in case
-  score = Math.min(score, 8);
-
-  // Determine Min Dimension (for Summary)
-  let minDimension: Dimension | null = null;
-  if (weeklyCompletion && score > 0) {
-    let minCount = Infinity;
-    // Check all configured dimensions, defaulting to 0 if not present in completion data
-    (Object.keys(DIMENSION_CONFIG) as Dimension[]).forEach((dim) => {
-      const count = weeklyCompletion[dim] || 0;
-      if (count < minCount) {
-        minCount = count;
-        minDimension = dim;
-      }
-    });
-  }
+    return Object.entries(DIMENSION_CONFIG)
+      .map(([key, config]) => ({
+        key,
+        ...config,
+        count: (allCompletion as Record<string, number>)[key] || 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [allCompletion]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -72,6 +46,7 @@ export default function ReviewScreen() {
 
         {/* Hero Card */}
         <View style={styles.heroCard}>
+
           <View style={styles.heroBackground}>
             {/* Abstract blobs */}
             <View style={styles.blob1} />
@@ -90,47 +65,46 @@ export default function ReviewScreen() {
           </View>
         </View>
 
-        {/* Stats Row */}
-        <View style={styles.statsRow}>
-          {/* Current Balance Card */}
-          <View style={styles.statCard}>
-            <Text style={styles.cardTitle}>Current Balance</Text>
-            <View style={styles.balanceRow}>
-              <Text style={styles.bigNumber}>{score}/8</Text>
-            </View>
-            <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${(score / 8) * 100}%` }]} />
-            </View>
-          </View>
+        {/* <LifeSummaryCard completionData={allCompletion as Record<string, number> | undefined} /> */}
 
-          {/* Weekly Focus Card */}
-          <View style={styles.statCard}>
-            <Text style={styles.cardTitle}>Weekly Focus</Text>
-            <Text style={styles.focusTitle}>
-              {maxDimension && DIMENSION_CONFIG[maxDimension] ? (DIMENSION_CONFIG as any)[maxDimension].name : 'N/A'}
-            </Text>
-            <Text style={styles.focusSubtitle}>
-              {maxDimension ? 'Most active ' : 'No activity yet'}
-            </Text>
-          </View>
-        </View>
+        {/* Life Aspect Leaderboard */}
+        <View style={styles.leaderboardSection}>
+          <Text style={styles.sectionTitle}>Overview</Text>
+          <View style={styles.leaderboardCard}>
+            {sortedDimensions.map((item, index) => {
+              const maxCount = Math.max(sortedDimensions[0]?.count || 0, 1);
+              const percentage = (item.count / maxCount) * 100;
 
-        {/* Life Summary Card */}
-        <View style={[styles.summaryCard]}>
-          <View style={styles.cardHeader}>
-            <IconSymbol name="sparkles" size={20} color="#2D8C7F" />
-            <Text style={styles.cardHeaderTitle}>Life Summary</Text>
-          </View>
-
-          <Text style={styles.summaryText}>
-            {maxDimension && minDimension ? (
-              <>
-                You've been highly productive in <Text style={styles.bold}>{(DIMENSION_CONFIG as any)[maxDimension].name}</Text> this week, but your <Text style={styles.bold}>{(DIMENSION_CONFIG as any)[minDimension].name}</Text> score is dipping. Time for a recalibration.
-              </>
-            ) : (
-              "Start checking in to unlock your personalized life summary."
+              return (
+                <TouchableOpacity
+                  key={item.key}
+                  onPress={() => router.push(`/dimension/${item.key}`)}
+                  style={[
+                    styles.leaderboardItem,
+                    index === sortedDimensions.length - 1 && styles.lastItem
+                  ]}
+                >
+                  <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
+                    <IconSymbol size={20} name={item.icon} color={item.color} />
+                  </View>
+                  <View style={styles.itemContent}>
+                    <Text style={styles.itemName}>{item.name}</Text>
+                    <View style={styles.progressTrack}>
+                      <View
+                        style={[
+                          styles.progressFill,
+                          { width: `${percentage}%`, backgroundColor: item.color }
+                        ]}
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+            {sortedDimensions.length === 0 && (
+              <Text style={styles.emptyText}>No entries yet. Start logging!</Text>
             )}
-          </Text>
+          </View>
         </View>
 
         {/* Bottom padding for tab bar */}
@@ -140,6 +114,9 @@ export default function ReviewScreen() {
     </SafeAreaView>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -280,30 +257,73 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontStyle: 'italic',
   },
-  summaryCard: {
-    backgroundColor: '#E0F2F1', // Light teal mint
-    borderRadius: 24,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: '#B2DFDB',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  cardHeaderTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2D8C7F',
-  },
-  summaryText: {
-    fontSize: 15,
-    lineHeight: 24,
-    color: '#11181C',
-  },
+
   bold: {
     fontWeight: '700',
+  },
+  leaderboardSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+  leaderboardCard: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  leaderboardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 12,
+  },
+  lastItem: {
+    marginBottom: 0,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  itemContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  itemName: {
+    minWidth: 80,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E293B',
+  },
+  progressTrack: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  emptyText: {
+    padding: 20,
+    textAlign: 'center',
+    color: '#888',
+    fontStyle: 'italic',
   },
 });

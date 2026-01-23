@@ -19,7 +19,7 @@ export default function HomeScreen() {
   };
 
   const startOfWeekTimestamp = getStartOfWeek();
-  const weeklyCompletion = useQuery(api.entries.weeklyCompletion, { startTimestamp: startOfWeekTimestamp });
+  const weeklyCompletion = useQuery(api.entries.entryCompletion, { startTimestamp: startOfWeekTimestamp });
 
   const getWeekInfo = () => {
     const now = new Date();
@@ -79,17 +79,24 @@ export default function HomeScreen() {
     return (
       <TouchableOpacity
         key={dimensionKey}
-        style={styles.card}
+        style={[styles.card, !isCompleted && styles.cardUnchecked]}
         onPress={() => router.push(`/dimension/${dimensionKey}`)}
       >
         <View style={styles.cardHeader}>
-          <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>
-            <IconSymbol size={24} name={DIMENSION_CONFIG[dimensionKey].icon} color={color} />
+          <View style={[
+            styles.iconContainer,
+            { backgroundColor: isCompleted ? color + '15' : '#F3F4F6' } // Light grey background if unchecked
+          ]}>
+            <IconSymbol
+              size={24}
+              name={DIMENSION_CONFIG[dimensionKey].icon}
+              color={isCompleted ? color : '#9CA3AF'} // Grey icon if unchecked
+            />
           </View>
         </View>
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>{name}</Text>
-          <Text style={styles.cardStatus}>{text}</Text>
+          <Text style={[styles.cardTitle, !isCompleted && styles.textUnchecked]}>{name}</Text>
+          <Text style={[styles.cardStatus, !isCompleted && styles.textUnchecked]}>{text}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -144,10 +151,10 @@ export default function HomeScreen() {
             HOLISTIC BALANCE: <Text style={styles.balanceValue}>{getBalanceScore()}%</Text>
           </Text>
         </View> */}
-        <BalanceChartCard />
+        <BalanceChartCard weeklyCompletion={weeklyCompletion ?? undefined} />
         {/* Pillars Grid */}
         <View style={styles.pillarsSection}>
-          <Text style={styles.pillarsTitle}>Life Pillars Status</Text>
+          <Text style={styles.pillarsTitle}>Life Pillars </Text>
           <View style={styles.dimensionsGrid}>
             {Object.entries(DIMENSION_CONFIG).map(([key]) =>
               renderDimensionCard(key as Dimension, (weeklyCompletion?.[key] ?? 0) > 0)
@@ -370,6 +377,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 8,
     elevation: 2,
+  },
+  cardUnchecked: {
+    backgroundColor: '#F9FAFB', // Very light grey
+    opacity: 0.9,
+    shadowOpacity: 0.01, // Lighter shadow
+  },
+  textUnchecked: {
+    color: '#9CA3AF', // Grey text
   },
   cardHeader: {
     flexDirection: 'row',
