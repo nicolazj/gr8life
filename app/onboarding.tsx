@@ -11,8 +11,7 @@ import {
     Pressable,
     StyleSheet,
     Text,
-    TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import Animated, {
     Easing,
@@ -29,7 +28,7 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
-const CIRCLE_SIZE = width * 0.8;
+const CIRCLE_SIZE = width * 0.7;
 const RADIUS = CIRCLE_SIZE / 2;
 const ICON_SIZE = 40; // Size of the icon
 // Adjust radius to place icons inside the circle border. 
@@ -174,10 +173,7 @@ export default function OnboardingScreen() {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>gr8Life</Text>
-                <TouchableOpacity onPress={completeOnboarding}>
-                    <Text style={styles.skipText}>Skip</Text>
-                </TouchableOpacity>
+
             </View>
 
             <View style={styles.contentContainer}>
@@ -287,7 +283,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 24,
-        paddingVertical: 16,
+        paddingVertical: 0,
     },
     headerTitle: {
         fontSize: 18,
@@ -300,7 +296,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     contentContainer: {
-        marginTop: 20,
+        marginTop: 0,
     },
     scrollContent: {
         alignItems: 'flex-start', // Important for horizontal paging
@@ -317,7 +313,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center', // Center in parent
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginVertical: 20,
         position: 'relative',
     },
     circleOuter: {
@@ -417,7 +413,7 @@ const styles = StyleSheet.create({
     indicatorContainer: {
         flexDirection: 'row',
         gap: 8,
-        marginBottom: 32,
+        marginBottom: 12,
     },
     indicator: {
         width: 8,

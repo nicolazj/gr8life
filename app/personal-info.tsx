@@ -105,7 +105,7 @@ export default function PersonalInfoScreen() {
                             style={styles.input}
                             value={firstName}
                             onChangeText={setFirstName}
-                            placeholder="First Name"
+                            placeholder=""
                             placeholderTextColor="#9CA3AF"
                         />
                     </View>
@@ -116,7 +116,7 @@ export default function PersonalInfoScreen() {
                             style={styles.input}
                             value={lastName}
                             onChangeText={setLastName}
-                            placeholder="Last Name"
+                            placeholder=""
                             placeholderTextColor="#9CA3AF"
                         />
                     </View>
@@ -152,10 +152,6 @@ export default function PersonalInfoScreen() {
                         <Text style={styles.cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
 
-                    <View style={styles.footer}>
-                        <Text style={styles.footerText}>gr8Life</Text>
-                        <Text style={styles.footerSubtext}>IDENTITY CONFIGURATION</Text>
-                    </View>
 
                 </ScrollView>
             </KeyboardAvoidingView>

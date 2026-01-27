@@ -1,13 +1,40 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SetupScreen() {
   const router = useRouter();
   const { user } = useUser();
   const { signOut } = useAuth();
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await user?.delete();
+              router.replace('/login');
+            } catch (error) {
+              console.error("Delete account error:", error);
+              Alert.alert("Error", "Failed to delete account. Please try again.");
+            }
+          }
+        }
+      ]
+
+    );
+  };
 
   const primaryColor = '#30837D';
 
@@ -128,6 +155,15 @@ export default function SetupScreen() {
         >
           <IconSymbol size={20} name="rectangle.portrait.and.arrow.right" color="#EF4444" />
           <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+
+        {/* Delete Account Button */}
+        <TouchableOpacity
+          style={[styles.logoutButton, { borderColor: 'transparent', marginTop: -20 }]}
+          onPress={handleDeleteAccount}
+        >
+          <IconSymbol size={20} name="trash" color="#9CA3AF" />
+          <Text style={[styles.logoutText, { color: '#9CA3AF' }]}>Delete Account</Text>
         </TouchableOpacity>
 
         {/* Version Info */}
